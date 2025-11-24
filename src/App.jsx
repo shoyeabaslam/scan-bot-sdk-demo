@@ -3,20 +3,21 @@ import ScanbotSDK from 'scanbot-web-sdk/ui'
 import './App.css'
 
 const LICENSE_KEY =
-  'lcVm8VYNuBLqXPLaRm1v1Di05XF19I' +
-  'HUuP2sl02q0dEeHJZr6+6/XjTYjzzo' +
-  'FGqJRIxS4ZRbYTeODQLrhPP6qq6Yq7' +
-  '4UjpxrrIk/dsHn/0iXTXYkolZWvrwu' +
-  'yuCWPrU+WpJIbotQoxZO871xg/i2Qs' +
-  'c5Lav4HJQM3zFjFW0R9qz5r6u+lvcx' +
-  '+t2sdfXCBivzcbT/4GMnkaAetBH8n9' +
-  'pSTjwBHWzHllgJ3MiYRdd2VobRw7cR' +
-  '05UeGPZM1H2f9tPQPCt0CE6ccX6ecF' +
-  'XKEo5Amyy26IMky6XQzsFFPXLLIKVU' +
-  'Arm7rA9sjv6iaeLUv7+GCIfwt06Duc' +
-  'xsMEgmdKQI2w==\nU2NhbmJvdFNESw' +
-  'psb2NhbGhvc3R8c2Nhbi1zZGsuY29t' +
-  'CjE3NjQ2MzM1OTkKODM4ODYwNwo4\n'
+  'I9WH335R2QxFJDOPcQAOfo3AHMxIUa' +
+  'McdyC+Eg2u4UsHcf4PSEMsGYCApaxU' +
+  'RzTFcE8FwEgpaUdgCilaqEggbCFIP0' +
+  'PnlqZZjjhDjc6VaVkUH80XXcipM+yY' +
+  'iz1OtQVxKJCOhlo7E+hYYvGPi3rLnz' +
+  'hs9ysov6HzKLGSdQWmLnf1WQsTasOg' +
+  'oSGxipXgfwFH2lwjisUyUE73KnG9CK' +
+  'g7wcCCtfBKvrrqwej1HXggrVB1+Bma' +
+  'n9FOKecMhHyNE+EwEmEPPPRTjgB62E' +
+  'pxQ8G1pDOmqP/4z/lZxqLROiZMBMAG' +
+  'cJaasL6xRKrPPNsAZTcdxMdCuiUX3+' +
+  '3Ly8631L8A6g==\nU2NhbmJvdFNESw' +
+  'psb2NhbGhvc3R8c2Nhbi1ib3Qtc2Rr' +
+  'LWRlbW8udmVyY2VsLmFwcAoxNzY0Nj' +
+  'MzNTk5CjgzODg2MDcKOA==\n'
 
 const ENGINE_PATH = '/scanbot-sdk/bin/complete/'
 
