@@ -59,10 +59,11 @@ function App() {
   const [status, setStatus] = useState('Booting Scanbot SDK…')
   const [docType, setDocType] = useState('id')
   const [autoCapture, setAutoCapture] = useState(true)
-  const [autoSensitivity, setAutoSensitivity] = useState(0.75)
+  const [autoSensitivity, setAutoSensitivity] = useState(0.9)
   const [isScannerOpen, setScannerOpen] = useState(false)
   const [captures, setCaptures] = useState([])
   const [previewImage, setPreviewImage] = useState(null)
+  const [previewBase64, setPreviewBase64] = useState(null)
   const containerRef = useRef(null)
   const scannerHandleRef = useRef(null)
 
@@ -113,7 +114,7 @@ function App() {
     setScannerOpen(false)
   }, [])
 
-  const handleDocumentDetected = useCallback(async (response) => {
+  const handleScanResult = useCallback(async (response) => {
     if (!response?.result?.croppedImage) {
       setStatus('Document detected but no crop was returned. Try again.')
       return
@@ -126,6 +127,7 @@ function App() {
       console.log('[Scanbot] Captured document (base64):', base64Image)
       setCaptures((prev) => [base64Image, ...prev].slice(0, 4))
       setPreviewImage(base64Image)
+      setPreviewBase64(base64Image)
       setStatus('Preview ready. Review the capture or retake it.')
       disposeScanner()
     } catch (error) {
@@ -133,6 +135,33 @@ function App() {
       setStatus(`Capture conversion failed: ${error?.message || error}`)
     }
   }, [disposeScanner])
+
+  const handleDocumentDetected = useCallback(
+    async (response) => {
+      await handleScanResult(response)
+    },
+    [handleScanResult],
+  )
+
+  const captureManually = useCallback(async () => {
+    if (!scannerHandleRef.current) {
+      setStatus('Scanner not active. Start scanning first.')
+      return
+    }
+
+    setStatus('Manual capture triggered…')
+    try {
+      const response = await scannerHandleRef.current.detectAndCrop()
+      if (!response) {
+        setStatus('Manual capture yielded no result. Adjust framing and try again.')
+        return
+      }
+      await handleScanResult(response)
+    } catch (error) {
+      console.error('Manual capture failed', error)
+      setStatus(`Manual capture failed: ${error?.message || error}`)
+    }
+  }, [handleScanResult])
 
   const buildScannerConfiguration = useCallback(() => {
     const aspectRatio = new ScanbotSDK.Config.AspectRatio({
@@ -144,7 +173,7 @@ function App() {
       container: containerRef.current ?? undefined,
       autoCaptureEnabled: autoCapture,
       autoCaptureSensitivity: autoSensitivity,
-      autoCaptureDelay: 900,
+      autoCaptureDelay: 450,
       useImageCaptureAPI: true,
       scannerConfiguration: {
         engineMode: 'ML',
@@ -193,13 +222,26 @@ function App() {
 
   const retakeCapture = useCallback(() => {
     setStatus('Retake requested. Relaunching scanner…')
+    setPreviewBase64(null)
     startScanner()
   }, [startScanner])
 
   const keepCapture = useCallback(() => {
     setPreviewImage(null)
+    setPreviewBase64(null)
     setStatus('Capture locked in. Start scanning again for more pages.')
   }, [])
+
+  const copyPreviewToClipboard = useCallback(async () => {
+    if (!previewBase64) return
+    try {
+      await navigator.clipboard.writeText(previewBase64)
+      setStatus('Base64 copied to clipboard.')
+    } catch (error) {
+      console.error('Failed to copy base64', error)
+      setStatus(`Unable to copy base64: ${error?.message || error}`)
+    }
+  }, [previewBase64])
 
   return (
     <div className="app-shell">
@@ -275,6 +317,9 @@ function App() {
             {previewImage ? (
               <div className="capture-preview">
                 <img src={previewImage} alt="Latest capture" />
+                <button type="button" className="ghost copy-btn" onClick={copyPreviewToClipboard}>
+                  Copy base64
+                </button>
                 <div className="preview-actions">
                   <button type="button" className="primary" onClick={keepCapture}>
                     Keep capture
@@ -293,6 +338,14 @@ function App() {
               )
             )}
           </div>
+          {isScannerOpen && !previewImage && (
+            <div className="scanner-actions">
+              <button type="button" className="primary" onClick={captureManually}>
+                Manual shutter
+              </button>
+              <span>Instant capture without waiting for auto snap.</span>
+            </div>
+          )}
           <div className="status-bar">
             <span className={`status-chip ${sdk ? 'status-chip--success' : 'status-chip--warning'}`}>
               {sdk ? 'SDK ready' : 'SDK offline'}
